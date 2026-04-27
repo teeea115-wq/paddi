@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useStore } from '@/store/useStore';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { PlusCircle, Clock, CheckCircle2, Layout, AlertTriangle, Info } from 'lucide-react';
+import { PlusCircle, Clock, CheckCircle2, Layout, AlertTriangle, Info, Zap } from 'lucide-react';
 import PaywallModal from '@/components/PaywallModal';
 
 export default function DashboardPage() {
@@ -150,7 +150,7 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-500">{new Date(room.created_at).toLocaleDateString()}</p>
               </div>
               <div className="flex items-center gap-2">
-                {room.status === 'drafting' && <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs flex items-center gap-1"><LayoutDraft size={12}/> Drafting</span>}
+                {room.status === 'drafting' && <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs flex items-center gap-1"><Layout size={12}/> Drafting</span>}
                 {room.status === 'voting' && <span className="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-xs flex items-center gap-1"><Clock size={12}/> Voting</span>}
                 {room.status === 'completed' && <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs flex items-center gap-1"><CheckCircle2 size={12}/> Completed</span>}
               </div>

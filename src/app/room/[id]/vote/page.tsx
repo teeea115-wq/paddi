@@ -59,7 +59,7 @@ export default function VotePage() {
     setVotedCardIds(votedIds);
     
     // Find first unvoted card
-    const firstUnvoted = cardsData?.findIndex(c => !votedIds.has(c.id));
+    const firstUnvoted = cardsData?.findIndex(c => !votedIds.has(c.id)) ?? -1;
     setCurrentIndex(firstUnvoted === -1 ? (cardsData?.length || 0) : firstUnvoted);
 
     const { data: membersData } = await supabase.from('room_members').select('*, users(email)').eq('room_id', id);
