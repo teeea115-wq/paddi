@@ -1,6 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+}
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -11,4 +13,6 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
