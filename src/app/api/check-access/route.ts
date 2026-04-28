@@ -1,19 +1,31 @@
-import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  console.log('=== CHECK ACCESS CALLED ===')
+  console.log('=== CHECK ACCESS CALLED (SSR) ===')
   try {
     const cookieStore = await cookies()
-    const supabase = createClient(
+    
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { global: { headers: { Cookie: cookieStore.toString() } } }
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          },
+        },
+      }
     )
-    
-    const { data: { user } } = await supabase.auth.getUser()
-    console.log('user:', user?.id)
+
+    const { data: { user }, error } = await supabase.auth.getUser()
+    console.log('user:', user?.id, 'error:', error?.message)
     
     if (!user) {
       console.log('returning: { allowed: false, reason: "not_authenticated" }')
@@ -29,7 +41,6 @@ export async function GET() {
 
     console.log('userData before check:', userData)
 
-    // If no user record, create one with trial start
     if (!userData) {
       const { data: newUser, error: insertError } = await supabase
         .from('users')
@@ -42,7 +53,6 @@ export async function GET() {
       console.log('created new userData:', userData)
     }
 
-    // If trial_start_at is null, set it now
     if (userData && !userData.trial_start_at) {
       const now = new Date().toISOString()
       const { error: updateError } = await supabase
@@ -55,13 +65,11 @@ export async function GET() {
       console.log('updated trial_start_at for userData:', userData)
     }
 
-    // Premium users always allowed
     if (userData?.is_premium) {
       console.log('returning: { allowed: true, reason: "premium" }')
       return NextResponse.json({ allowed: true, reason: 'premium' })
     }
 
-    // Check trial expiry
     if (userData?.trial_start_at) {
       const trialStart = new Date(userData.trial_start_at)
       const trialEnd = new Date(trialStart.getTime() + 30 * 24 * 60 * 60 * 1000)
@@ -72,7 +80,6 @@ export async function GET() {
       }
     }
 
-    // Check daily quota
     const today = new Date().toISOString().split('T')[0]
     const { count, error: countError } = await supabase
       .from('usage_log')
