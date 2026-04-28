@@ -78,19 +78,24 @@ export default function DashboardPage() {
   }, [fetchData]);
 
   const handleCreateRoom = async () => {
+    console.log('=== CREATE ROOM CLICKED ===');
     setLoading(true);
     try {
       const res = await fetch('/api/check-access');
       const access = await res.json();
+      console.log('check-access response:', access);
 
       if (!access.allowed) {
+        console.log('Access denied, reason:', access.reason);
         setPaywallReason(access.reason);
         setPaywallOpen(true);
         return;
       }
 
+      console.log('Access allowed, redirecting to /room/create');
       router.push('/room/create');
     } catch (error) {
+      console.log('ERROR calling check-access:', error);
       toast.error('Connection error');
     } finally {
       setLoading(false);
