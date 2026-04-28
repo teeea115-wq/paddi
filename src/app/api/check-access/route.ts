@@ -25,19 +25,24 @@ export async function GET(request: Request) {
     .eq('id', authUser.id)
     .single();
 
-  if (!profile) return NextResponse.json({ allowed: false, reason: 'user_not_found' }, { status: 404 });
+  if (!profile) {
+    // If profile doesn't exist yet, we allow it (new user)
+    return NextResponse.json({ allowed: true, reason: 'new_user' });
+  }
 
   if (profile.is_premium) {
     return NextResponse.json({ allowed: true, reason: 'premium' });
   }
 
   // Check Trial
-  const trialStart = new Date(profile.trial_start_at);
-  const now = new Date();
-  const trialDaysElapsed = Math.floor((now.getTime() - trialStart.getTime()) / (1000 * 3600 * 24));
-  
-  if (trialDaysElapsed >= 30) {
-    return NextResponse.json({ allowed: false, reason: 'trial_expired' });
+  if (profile.trial_start_at) {
+    const trialStart = new Date(profile.trial_start_at);
+    const now = new Date();
+    const trialDaysElapsed = Math.floor((now.getTime() - trialStart.getTime()) / (1000 * 3600 * 24));
+    
+    if (trialDaysElapsed >= 30) {
+      return NextResponse.json({ allowed: false, reason: 'trial_expired' });
+    }
   }
 
   // Check Quota
