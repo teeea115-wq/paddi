@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase-browser';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Trophy, Star, MapPin, Heart, X, ChevronLeft, Loader2 } from 'lucide-react';
@@ -12,6 +12,7 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState<any[]>([]);
   const [room, setRoom] = useState<any>(null);
+  const supabase = createClient();
 
   const fetchResults = useCallback(async () => {
     // 1. Fetch Room and Cards

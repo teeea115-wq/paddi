@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase-browser';
 import { useStore } from '@/store/useStore';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -29,6 +29,7 @@ export default function DashboardPage() {
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [paywallReason, setPaywallReason] = useState('');
   const router = useRouter();
+  const supabase = createClient();
 
   const fetchData = useCallback(async () => {
     const { data: { user: authUser } } = await supabase.auth.getUser();

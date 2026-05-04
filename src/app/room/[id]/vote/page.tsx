@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase-browser';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -10,6 +10,7 @@ import { Heart, X, Star, MapPin, Trophy, Loader2, CheckCircle2 } from 'lucide-re
 export default function VotePage() {
   const { id } = useParams();
   const router = useRouter();
+  const supabase = createClient();
   
   const [room, setRoom] = useState<any>(null);
   const [cards, setCards] = useState<any[]>([]);

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, LogIn, Globe, User, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, LogIn, Globe, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  const router = useRouter();
+  const supabase = createClient();
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -41,7 +41,10 @@ export default function LoginPage() {
       if (mode === 'signin') {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        if (data.user) await postLoginCheck(data.user.id);
+        if (data.user) {
+          await postLoginCheck(data.user.id);
+          window.location.href = '/dashboard';
+        }
       } else {
         const { data, error } = await supabase.auth.signUp({ 
           email, 
@@ -85,7 +88,6 @@ export default function LoginPage() {
         .update({ trial_start_at: new Date().toISOString() })
         .eq('id', userId);
     }
-    router.push('/dashboard');
   };
 
   return (

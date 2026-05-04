@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase-browser';
 import { useParams, useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
@@ -18,6 +18,7 @@ export default function RoomLobbyPage() {
   const [nearbyPlaces, setNearbyPlaces] = useState<any[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
+  const supabase = createClient();
 
   const fetchCards = useCallback(async () => {
     const { data } = await supabase.from('cards').select('*').eq('room_id', id);
